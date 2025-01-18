@@ -1,0 +1,78 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Job Scheduler API
+
+paths:
+  /jobs:
+    post:
+      summary: Submit a new job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Job"
+      responses:
+        "200":
+          description: Job successfully submitted
+        "400":
+          description: Invalid job submission
+
+components:
+  schemas:
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the job
+        parameters:
+          $ref: "#/components/schemas/JobParameters"
+      required:
+        - id
+        - parameters
+
+    JobParameters:
+      oneOf:
+        - $ref: "#/components/schemas/DataProcessingJob"
+        - $ref: "#/components/schemas/NotificationJob"
+      discriminator:
+        propertyName: jobType
+        mapping:
+          dataProcessing: "#/components/schemas/DataProcessingJob"
+          notification: "#/components/schemas/NotificationJob"
+
+    DataProcessingJob:
+      type: object
+      properties:
+        jobType:
+          type: string
+          enum: ["dataProcessing"]
+        dataset:
+          type: string
+          description: Identifier for the dataset to be processed
+        algorithm:
+          type: string
+          description: Algorithm to use for processing
+      required:
+        - jobType
+        - dataset
+        - algorithm
+
+    NotificationJob:
+      type: object
+      properties:
+        jobType:
+          type: string
+          enum: ["notification"]
+        recipient:
+          type: string
+          description: Recipient of the notification
+        message:
+          type: string
+          description: Message content
+      required:
+        - jobType
+        - recipient
+        - message

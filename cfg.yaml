@@ -1,0 +1,5 @@
+package: main
+output: main.gen.go
+generate:
+  echo-server: true
+  models: true
